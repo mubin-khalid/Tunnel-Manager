@@ -3,12 +3,17 @@ name: Release (macOS DMG)
 on:
   push:
 
+concurrency:
+  group: tunnel-manager-release
+  cancel-in-progress: false
+
 jobs:
   build:
     permissions:
       contents: write
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - platform: macos-latest
@@ -42,8 +47,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: tunnel-manager-macos-${{ matrix.target }}-dmg-v__VERSION__-${{ github.sha }}
-          releaseName: Tunnel Manager macOS DMG v__VERSION__ (${{ github.sha }})
+          tagName: v-__VERSION__
+          releaseName: Tunnel Manager v__VERSION__
           releaseBody: Automated DMG build from GitHub Actions.
           releaseDraft: false
           prerelease: false

@@ -3,6 +3,10 @@ name: Release (Linux AppImage)
 on:
   push:
 
+concurrency:
+  group: tunnel-manager-release
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -36,8 +40,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: tunnel-manager-linux-appimage-v__VERSION__-${{ github.sha }}
-          releaseName: Tunnel Manager Linux AppImage v__VERSION__ (${{ github.sha }})
+          tagName: v-__VERSION__
+          releaseName: Tunnel Manager v__VERSION__
           releaseBody: Automated AppImage build from GitHub Actions.
           releaseDraft: false
           prerelease: false
