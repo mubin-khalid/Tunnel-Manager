@@ -105,5 +105,5 @@ edit the version in those files.
 
 ## Reporting Issues
 
-Please sure you include thuse the GitHub issue templates — they make e right
+Please use the GitHub issue templates — they ensure you include the right
 information to reproduce the problem.
