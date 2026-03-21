@@ -107,3 +107,12 @@ edit the version in those files.
 
 Please use the GitHub issue templates — they ensure you include the right
 information to reproduce the problem.
+
+### Git hooks
+
+After cloning, register the project git hooks:
+```bash
+git config core.hooksPath .githooks
+```
+
+This runs `cargo fmt` automatically before every commit.
