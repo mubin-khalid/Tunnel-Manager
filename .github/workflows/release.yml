@@ -63,7 +63,7 @@ jobs:
             echo "EOF"
           } >> $GITHUB_OUTPUT
 
-      - name: Create draft GitHub Release
+      - name: Create draft GitHub Release (Linux bundles)
         id: create-release
         uses: tauri-apps/tauri-action@action-v0.6.2
         env:
@@ -74,3 +74,40 @@ jobs:
           releaseBody: ${{ steps.changelog.outputs.body }}
           releaseDraft: true
           prerelease: false
+
+  build-dmg:
+    needs: create-release
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [aarch64-apple-darwin, x86_64-apple-darwin]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install frontend dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Build and upload DMG
+        uses: tauri-apps/tauri-action@action-v0.6.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          args: '--bundles dmg --target ${{ matrix.target }}'

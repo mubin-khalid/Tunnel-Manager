@@ -78,7 +78,7 @@ src/                  # React frontend
   types/              # TypeScript types
 src-tauri/            # Rust backend (Tauri)
   src/lib.rs          # All Tauri commands (process management, file I/O)
-.github/workflows/    # CI — ci.yml, release.yml (Linux bundles), build-dmg.yml (macOS)
+.github/workflows/    # ci.yml (PRs); release.yml (push main → draft release + Linux + macOS DMGs)
 scripts/              # sync-version.mjs (keeps package.json/Cargo.toml in sync)
 ```
 
@@ -86,11 +86,17 @@ scripts/              # sync-version.mjs (keeps package.json/Cargo.toml in sync)
 
 ## Versioning
 
-Version is the single source of truth in `package.json`. After you bump it,
-run `pnpm prebuild` (or `node scripts/sync-version.mjs`) so `src-tauri/Cargo.toml`
-and `src-tauri/tauri.conf.json` stay in sync. The `prebuild` hook runs before
-`pnpm build`, so a normal frontend build updates them too. Do not hand-edit
-version lines in `Cargo.toml` or `tauri.conf.json`.
+Version is the single source of truth in `package.json`. After you bump it:
+
+1. Run `pnpm prebuild` or `node scripts/sync-version.mjs` so `src-tauri/Cargo.toml`
+   and `src-tauri/tauri.conf.json` match (the `prebuild` hook also runs before
+   `pnpm build`). Do not hand-edit version lines in those files.
+2. Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md` (move items out of
+   **`[Unreleased]`** when you cut the release) and update the compare links at
+   the bottom of that file.
+
+Git tags for releases follow **`v` + semver** (for example `v0.2.3`), matching
+what `.github/workflows/release.yml` derives from `package.json`.
 
 ---
 
