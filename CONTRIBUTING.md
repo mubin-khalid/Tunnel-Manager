@@ -78,7 +78,7 @@ src/                  # React frontend
   types/              # TypeScript types
 src-tauri/            # Rust backend (Tauri)
   src/lib.rs          # All Tauri commands (process management, file I/O)
-.github/workflows/    # CI — release.yml, build-dmg.yml, build-appimage.yml
+.github/workflows/    # CI — ci.yml, release.yml (Linux bundles), build-dmg.yml (macOS)
 scripts/              # sync-version.mjs (keeps package.json/Cargo.toml in sync)
 ```
 
