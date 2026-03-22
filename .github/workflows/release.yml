@@ -1,25 +1,45 @@
-name: Create Release
+name: Upload release artifacts
 
+# Builds only when a GitHub Release is created — not on every push to main.
+# Maintainers: create a Release (and tag vX.Y.Z) that matches package.json; this workflow uploads Linux + macOS bundles to that release.
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [created]
 
 concurrency:
-  group: tunnel-manager-release
+  group: tunnel-manager-release-${{ github.event.release.id }}
   cancel-in-progress: false
 
 jobs:
-  create-release:
+  verify-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify package.json matches release tag
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VER="${TAG#v}"
+          PKG=$(node -p "require('./package.json').version")
+          if [ "$VER" != "$PKG" ]; then
+            echo "::error::Release tag $TAG (expected version $VER) does not match package.json ($PKG)"
+            exit 1
+          fi
+
+  build-linux:
+    name: Build Linux bundles
+    needs: verify-release
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      release_id: ${{ steps.create-release.outputs.releaseId }}
-
     steps:
-      - name: Checkout
+      - name: Checkout release tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -31,7 +51,6 @@ jobs:
           corepack enable
           pnpm install --frozen-lockfile
 
-      # Tauri v2 Linux deps — build uploads deb/rpm/appimage (bundle.targets in tauri.conf.json)
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -46,37 +65,17 @@ jobs:
             librsvg2-dev \
             patchelf
 
-      - name: Read version from package.json
-        id: version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - name: Read changelog entry for this version
-        id: changelog
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          # Extract the block between ## [X.Y.Z] and the next ## heading
-          BODY=$(awk "/^## \[$VERSION\]/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)
-          # Pass multiline string safely to GITHUB_OUTPUT
-          {
-            echo "body<<EOF"
-            echo "$BODY"
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
-
-      - name: Create draft GitHub Release (Linux bundles)
-        id: create-release
+      - name: Build and upload Linux artifacts
         uses: tauri-apps/tauri-action@action-v0.6.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__
-          releaseName: Tunnel Manager v__VERSION__
-          releaseBody: ${{ steps.changelog.outputs.body }}
-          releaseDraft: true
-          prerelease: false
+          releaseId: ${{ github.event.release.id }}
+          tagName: ${{ github.event.release.tag_name }}
 
   build-dmg:
-    needs: create-release
+    name: Build macOS DMG
+    needs: verify-release
     runs-on: macos-latest
     permissions:
       contents: write
@@ -86,8 +85,10 @@ jobs:
         target: [aarch64-apple-darwin, x86_64-apple-darwin]
 
     steps:
-      - name: Checkout
+      - name: Checkout release tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -109,5 +110,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          releaseId: ${{ needs.create-release.outputs.release_id }}
+          releaseId: ${{ github.event.release.id }}
+          tagName: ${{ github.event.release.tag_name }}
           args: '--bundles dmg --target ${{ matrix.target }}'

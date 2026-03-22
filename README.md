@@ -5,7 +5,7 @@
 ![Linux](https://img.shields.io/badge/platform-Linux-FCC624?logo=linux&logoColor=black)
 ![CI](https://img.shields.io/github/actions/workflow/status/mubin-khalid/tunnel-manager/ci.yml?label=CI&logo=github)
 ![Tests](https://img.shields.io/github/actions/workflow/status/mubin-khalid/tunnel-manager/ci.yml?label=tests&logo=github)
-![Release](https://img.shields.io/github/actions/workflow/status/mubin-khalid/tunnel-manager/release.yml?branch=main&label=release&logo=github)
+![Release](https://img.shields.io/github/actions/workflow/status/mubin-khalid/tunnel-manager/release.yml?label=release&logo=github)
 
 # Tunnel Manager
 

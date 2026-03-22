@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **GitHub Actions:** `release.yml` runs on **`release: created`** (not `push` to `main`). Linux and macOS builds upload assets to the **existing** GitHub Release; routine merges no longer touch release state. The workflow verifies `package.json` `version` matches the release tag.
+
 ## [0.2.4] - 2026-03-22
 
 ### Added

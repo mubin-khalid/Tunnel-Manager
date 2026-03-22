@@ -81,7 +81,7 @@ src/                  # React frontend
   config/             # Build-time helpers (e.g. repository URL from package.json)
 src-tauri/            # Rust backend (Tauri)
   src/lib.rs          # All Tauri commands (process management, file I/O)
-.github/workflows/    # ci.yml (PRs); release.yml (push main → draft release + Linux + macOS DMGs)
+.github/workflows/    # ci.yml (PRs); release.yml (on GitHub Release created → upload Linux + macOS DMGs)
 scripts/              # sync-version.mjs, sync-repo-urls.mjs, repo-utils.mjs
 ```
 
@@ -103,8 +103,15 @@ Version is the single source of truth in `package.json`. After you bump it:
    either run `pnpm sync:repo` (uses `package.json` `repository`) or update them
    to match the new remote.
 
-Git tags for releases follow **`v` + semver** (for example `v0.2.3`), matching
-what `.github/workflows/release.yml` derives from `package.json`.
+Git tags for releases follow **`v` + semver** (for example `v0.2.3`). The tag name
+(without `v`) must match `package.json` `version` — the release workflow checks this.
+
+**Cutting a release:** merging to `main` does **not** publish binaries. After the
+version bump is on `main`, open **GitHub → Releases → Draft a new release**, pick
+or create tag `vX.Y.Z` (must match `package.json`), and publish (or save as
+draft; `release.yml` runs on `release: created` and uploads **deb**, **rpm**,
+**AppImage**, and **DMG** assets to that release). Pushing only a git tag without
+creating a GitHub Release does not run this workflow.
 
 ---
 
