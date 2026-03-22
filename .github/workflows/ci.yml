@@ -58,21 +58,12 @@ jobs:
       - name: Install system dependencies
         if: steps.rust-changes.outputs.changed == 'true'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libappindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            libglib2.0-dev \
-            libglib2.0-dev-bin \
-            libgtk-3-dev \
-            libsoup-3.0-dev \
-            libjavascriptcoregtk-4.1-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            libsecret-1-dev \
-            patchelf
+            sudo apt-get update
+            sudo apt-get install -y \
+              libwebkit2gtk-4.1-dev \
+              libappindicator3-dev \
+              librsvg2-dev \
+              patchelf
       - name: cargo fmt
         if: steps.rust-changes.outputs.changed == 'true'
         run: cargo fmt --check
