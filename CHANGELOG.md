@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-22
+
 ### Added
 - Tunnel enable/disable toggle with free-plan 3-tunnel limit enforcement
 - CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue and PR templates
@@ -23,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ngrok.yml` is now generated at start time from enabled tunnels only
 - Dashboard empty state now reflects enabled tunnels, not total defined
 - Start is blocked with an error message if no tunnels are enabled
+- Extracted `stripUrl`, `normalizeHost`, `normalizeAddr`, `formatTunnelName` to `src/utils/tunnel.ts`
+- Extracted `toErrorString` to `src/utils/error.ts`, replaced all `catch (e: any)` usages
+- Extracted tunnel form/save logic from `TunnelsPage` into `useTunnelForm` hook
 
 ### Fixed
 - Zombie process on Unix after stop_ngrok (child.wait() after kill)
